@@ -1,0 +1,28 @@
+{
+  "name": "ระบบรับสมัครฝึกงานและสหกิจศึกษา BA&IT มทร.สุวรรณภูมิ",
+  "short_name": "ฝึกงาน-สหกิจ",
+  "description": "ยื่นใบสมัครฝึกงาน/สหกิจศึกษา ส่งหนังสือตอบรับ ตรวจสอบสถานะ และระบบอาจารย์นิเทศ คณะบริหารธุรกิจและเทคโนโลยีสารสนเทศ มหาวิทยาลัยเทคโนโลยีราชมงคลสุวรรณภูมิ",
+  "lang": "th",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#1f3a5f",
+  "theme_color": "#1f3a5f",
+  "categories": ["education", "productivity"],
+  "launch_handler": { "client_mode": "navigate-existing" },
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "ยื่นใบสมัคร", "short_name": "ยื่นใบสมัคร", "url": "./?tab=apply", "icons": [{ "src": "icons/favicon-96.png", "sizes": "96x96", "type": "image/png" }] },
+    { "name": "ส่งเอกสารตอบรับบริษัท", "short_name": "ส่งใบตอบรับ", "url": "./?tab=confirm", "icons": [{ "src": "icons/favicon-96.png", "sizes": "96x96", "type": "image/png" }] },
+    { "name": "ตรวจสอบสถานะใบสมัคร", "short_name": "เช็กสถานะ", "url": "./?tab=status", "icons": [{ "src": "icons/favicon-96.png", "sizes": "96x96", "type": "image/png" }] },
+    { "name": "ระบบอาจารย์นิเทศสหกิจ", "short_name": "นิเทศสหกิจ", "url": "./?tab=nitet", "icons": [{ "src": "icons/favicon-96.png", "sizes": "96x96", "type": "image/png" }] }
+  ]
+}

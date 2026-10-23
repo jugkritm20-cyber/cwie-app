@@ -1,0 +1,979 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ระบบรับสมัครฝึกงานและสหกิจศึกษา · BA&amp;IT มทร.สุวรรณภูมิ</title>
+<meta name="description" content="ยื่นใบสมัครฝึกงาน/สหกิจศึกษา ส่งหนังสือตอบรับ ตรวจสอบสถานะ และระบบอาจารย์นิเทศ คณะบริหารธุรกิจและเทคโนโลยีสารสนเทศ มหาวิทยาลัยเทคโนโลยีราชมงคลสุวรรณภูมิ">
+<meta name="theme-color" content="#1f3a5f">
+<meta name="color-scheme" content="light">
+<meta name="format-detection" content="telephone=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ฝึกงาน-สหกิจ">
+<meta name="application-name" content="ฝึกงาน-สหกิจ">
+<meta property="og:title" content="ระบบรับสมัครฝึกงานและสหกิจศึกษา BA&amp;IT">
+<meta property="og:description" content="ยื่นใบสมัคร ส่งหนังสือตอบรับ และตรวจสอบสถานะได้จากมือถือ">
+<meta property="og:image" content="icons/icon-512.png">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="icons/favicon-96.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://script.google.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1f3a5f; --navy-2:#17304f; --blue:#2a78d6; --amber:#fab219; --amber-ink:#2b1d00;
+  --bg:#f4f6f9; --surface:#fff; --ink:#16181d; --ink-2:#4b4f58; --muted:#7c818b; --line:#e3e6ea;
+  --crit:#b42318; --good:#14632a;
+  --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
+  --sal:env(safe-area-inset-left,0px); --sar:env(safe-area-inset-right,0px);
+  --font:"IBM Plex Sans Thai",-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,"Noto Sans Thai",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--navy);font-family:var(--font);color:var(--ink);
+  -webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;text-size-adjust:100%;overscroll-behavior:none}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+a{color:var(--blue)}
+[hidden]{display:none!important}
+svg.i{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+svg.i.sm{width:17px;height:17px}
+
+/* ---------- โครงแอป ---------- */
+#shell{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--bg)}
+.bar{position:relative;flex:none;display:flex;align-items:center;gap:8px;z-index:5;
+  padding:calc(var(--sat) + 8px) calc(var(--sar) + 6px) 8px calc(var(--sal) + 12px);
+  background:var(--navy);color:#fff;box-shadow:0 2px 12px rgba(10,20,40,.2)}
+.bar-logo{width:34px;height:34px;border-radius:9px;flex:none}
+.bar-title{display:flex;flex-direction:column;min-width:0;flex:1;line-height:1.25;margin-left:2px}
+.bar-title b{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-title span{font-size:12px;opacity:.72;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-btn{width:42px;height:42px;border-radius:50%;border:0;background:transparent;color:#fff;
+  display:inline-flex;align-items:center;justify-content:center;flex:none}
+.bar-btn:hover{background:rgba(255,255,255,.12)}
+.bar-btn:active{background:rgba(255,255,255,.22)}
+.bar-btn:focus-visible,.bar-chip:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.bar-chip{border:0;background:var(--amber);color:var(--amber-ink);font-weight:600;font-size:13.5px;
+  min-height:34px;padding:6px 12px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;flex:none;white-space:nowrap}
+.bar-progress{position:absolute;left:0;right:0;bottom:0;height:3px;overflow:hidden;opacity:0;transition:opacity .3s}
+.bar-progress.on{opacity:1}
+.bar-progress::before{content:"";position:absolute;top:0;bottom:0;width:38%;background:var(--amber);border-radius:2px;animation:slide 1.1s ease-in-out infinite}
+@keyframes slide{0%{left:-38%}100%{left:100%}}
+.net-banner{flex:none;display:flex;align-items:center;gap:8px;background:#fff4e5;color:#7a4b00;
+  font-size:13.5px;line-height:1.4;padding:7px calc(var(--sar) + 14px) 7px calc(var(--sal) + 14px);border-bottom:1px solid #f5d9a8}
+.stage{position:relative;flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;background:#f8f9fa;
+  padding:0 var(--sar) var(--sab) var(--sal)}
+.stage iframe{display:block;width:100%;height:100%;border:0;background:#f8f9fa}
+
+/* ---------- ปุ่ม ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:10px 18px;
+  border-radius:12px;border:1px solid transparent;font-weight:600;font-size:15px;text-decoration:none;line-height:1.3}
+.btn:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.btn-amber{background:var(--amber);color:var(--amber-ink)}
+.btn-navy{background:var(--navy);color:#fff}
+.btn-outline{background:#fff;color:var(--navy);border-color:#cfd6e0}
+.btn-glass{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.28)}
+.btn-block{width:100%}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+
+/* ---------- หน้าจอเปิดแอป ---------- */
+.screen{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  padding:calc(var(--sat) + 24px) calc(var(--sar) + 22px) calc(var(--sab) + 24px) calc(var(--sal) + 22px);overflow:auto}
+.splash{color:#fff;transition:opacity .35s ease,visibility .35s;
+  background:radial-gradient(110% 70% at 15% 5%,rgba(90,140,210,.45) 0%,rgba(90,140,210,0) 60%),linear-gradient(160deg,#18304f 0%,#1f3a5f 45%,#245aa2 100%)}
+.splash.out{opacity:0;visibility:hidden}
+.splash-logo{width:104px;height:104px;border-radius:26px;box-shadow:0 14px 34px rgba(0,0,0,.3)}
+.splash h1{font-size:21px;line-height:1.4;margin:22px 0 4px;font-weight:700}
+.splash .sub{margin:0;font-size:14px;opacity:.78;max-width:330px;line-height:1.55}
+.splash-load{position:relative;width:170px;height:4px;border-radius:2px;background:rgba(255,255,255,.18);overflow:hidden;margin:30px auto 12px}
+.splash-load::before{content:"";position:absolute;top:0;bottom:0;width:40%;background:var(--amber);border-radius:2px;animation:slide 1.1s ease-in-out infinite}
+.splash-status{font-size:13.5px;opacity:.88;min-height:21px;max-width:320px;line-height:1.5}
+.splash-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:18px}
+.splash-ver{position:absolute;left:0;right:0;bottom:calc(var(--sab) + 14px);font-size:12px;opacity:.5}
+
+.state{background:var(--bg);color:var(--ink)}
+.state-card{width:100%;max-width:440px;background:#fff;border:1px solid var(--line);border-radius:20px;padding:28px 22px 22px;box-shadow:0 10px 30px rgba(16,24,40,.08)}
+.state-ico{width:64px;height:64px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#eef3fa;color:var(--navy)}
+.state-ico svg.i{width:30px;height:30px}
+.state h2{font-size:19px;margin:12px 0 6px}
+.state p{color:var(--ink-2);font-size:14.5px;line-height:1.6;margin:0 0 16px}
+.field{text-align:left;margin:16px 0 12px}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--ink-2);margin-bottom:6px}
+.field input{width:100%;font-size:16px;padding:12px 13px;border:1px solid #cfd6e0;border-radius:12px;background:#fff}
+.field input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(42,120,214,.18)}
+.help{font-size:12.5px;color:var(--muted);line-height:1.6;text-align:left;margin:10px 0 0}
+.err{color:var(--crit);font-size:13px;text-align:left;margin-top:6px;min-height:18px}
+.center{text-align:center}
+
+/* ---------- แถบแนะนำติดตั้ง ---------- */
+.hint{position:fixed;z-index:15;left:calc(var(--sal) + 12px);right:calc(var(--sar) + 12px);bottom:calc(var(--sab) + 12px);
+  max-width:520px;margin:0 auto;background:#fff;border:1px solid var(--line);border-radius:18px;
+  box-shadow:0 14px 34px rgba(16,24,40,.24);display:flex;align-items:center;gap:12px;padding:12px 10px 12px 12px;animation:up .35s ease}
+.hint img{width:46px;height:46px;border-radius:12px;flex:none}
+.hint-txt{flex:1;min-width:0;line-height:1.35}
+.hint-txt b{display:block;font-size:14.5px}
+.hint-txt span{font-size:12.5px;color:var(--ink-2)}
+.hint .btn{min-height:38px;padding:7px 14px;font-size:14px;border-radius:10px}
+.icon-x{width:34px;height:34px;border-radius:50%;border:0;background:transparent;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;flex:none}
+.icon-x:hover{background:#f1f3f6}
+@keyframes up{from{transform:translateY(18px);opacity:0}}
+
+/* ---------- Bottom sheet / เมนู ---------- */
+.sheet-wrap{position:fixed;inset:0;z-index:30}
+.sheet-backdrop{position:absolute;inset:0;background:rgba(15,23,42,.45);animation:fade .2s ease}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:88vh;max-height:88dvh;background:#fff;border-radius:22px 22px 0 0;
+  display:flex;flex-direction:column;padding-bottom:var(--sab);box-shadow:0 -10px 34px rgba(0,0,0,.2);animation:sheetUp .26s cubic-bezier(.2,.8,.2,1)}
+.sheet-grip{width:42px;height:5px;border-radius:3px;background:#d5d9e0;margin:8px auto 0;flex:none}
+.sheet-head{display:flex;align-items:center;gap:8px;padding:10px 12px 4px calc(var(--sal) + 20px);flex:none}
+.sheet-head h2{flex:1;margin:0;font-size:17.5px}
+.sheet-body{overflow:auto;-webkit-overflow-scrolling:touch;padding:6px calc(var(--sar) + 20px) 22px calc(var(--sal) + 20px)}
+@keyframes sheetUp{from{transform:translateY(100%)}}
+@keyframes fade{from{opacity:0}}
+@keyframes pop{from{transform:translateY(-6px);opacity:0}}
+@media (min-width:720px){
+  .sheet{left:auto;right:calc(var(--sar) + 16px);bottom:auto;top:calc(var(--sat) + 62px);width:420px;border-radius:18px;
+    max-height:calc(100vh - 90px);padding-bottom:0;animation:pop .18s ease}
+  .sheet-grip{display:none}
+}
+.mi{display:flex;align-items:center;gap:14px;width:100%;border:0;background:transparent;padding:11px 6px;border-radius:14px;
+  text-align:left;font-size:15.5px;text-decoration:none;color:inherit;line-height:1.35}
+.mi:hover,.mi:focus-visible{background:#f4f6f9;outline:none}
+.mi-ico{width:42px;height:42px;border-radius:12px;background:#eef3fa;color:var(--navy);display:inline-flex;align-items:center;justify-content:center;flex:none}
+.mi small{display:block;color:var(--muted);font-size:12.5px;margin-top:1px}
+.mi-row{display:flex;align-items:center;gap:14px;padding:11px 6px;flex-wrap:wrap}
+.mi-row > div{flex:1;min-width:92px;font-size:15.5px}
+.mi-row .seg{display:flex;flex:1 1 100%;margin:-4px 0 0 56px}
+.mi-row .seg button{flex:1}
+.seg{display:inline-flex;background:#eef1f5;border-radius:11px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;padding:7px 11px;border-radius:8px;font-size:14px;color:var(--ink-2);min-height:36px;white-space:nowrap}
+.seg button.on{background:#fff;color:var(--navy);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.lead{font-size:15px;color:var(--ink-2);line-height:1.6;margin:4px 0 6px}
+.steps{list-style:none;margin:4px 0 0;padding:0;counter-reset:s}
+.steps li{position:relative;padding:12px 0 12px 46px;border-bottom:1px dashed var(--line);font-size:15px;line-height:1.65;counter-increment:s}
+.steps li:last-child{border-bottom:0}
+.steps li::before{content:counter(s);position:absolute;left:0;top:11px;width:32px;height:32px;border-radius:50%;background:var(--navy);color:#fff;
+  font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center}
+.steps small{display:block;color:var(--muted);font-size:13px;line-height:1.5;margin-top:2px}
+.kbd{display:inline-flex;align-items:center;gap:5px;background:#eef3fa;color:var(--navy);border-radius:8px;padding:1px 8px;font-weight:600;white-space:nowrap;vertical-align:1px}
+.kbd svg.i{width:16px;height:16px}
+.note{background:#f4f6f9;border-radius:12px;padding:11px 13px;font-size:13.5px;color:var(--ink-2);line-height:1.6;margin-top:12px}
+.note.warn{background:#fff4e5;color:#7a4b00}
+.note.ok{background:#e9f7ee;color:var(--good)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px;margin:6px 0 4px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;word-break:break-all}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 8px}
+.chips button{border:1px solid #cfd6e0;background:#fff;border-radius:999px;padding:6px 12px;font-size:13.5px;min-height:34px}
+.chips button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.qr-box{display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px 0 4px}
+.qr-box img{width:232px;max-width:100%;height:auto;border-radius:14px;border:1px solid var(--line);background:#fff}
+.qr-box small{color:var(--muted);font-size:12.5px}
+.linkbox{display:flex;gap:6px;align-items:center;background:#f4f6f9;border-radius:12px;padding:6px 6px 6px 12px;margin-top:8px}
+.linkbox code{flex:1;min-width:0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;color:var(--ink-2);word-break:break-all;line-height:1.45}
+.linkbox button{width:40px;height:40px;border-radius:10px;border:0;background:#fff;color:var(--navy);display:inline-flex;align-items:center;justify-content:center;flex:none}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.row .btn{flex:1 1 140px}
+
+/* ---------- Toast ---------- */
+.toast{position:fixed;z-index:40;left:50%;bottom:calc(var(--sab) + 26px);transform:translate(-50%,18px);background:#1d2433;color:#fff;
+  padding:11px 16px;border-radius:12px;font-size:14px;line-height:1.45;max-width:calc(100vw - 32px);opacity:0;pointer-events:none;
+  transition:opacity .2s,transform .2s;box-shadow:0 10px 30px rgba(0,0,0,.28);text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:400px){
+  .bar-title span{display:none}
+  .bar-chip span{display:none}
+  .bar-chip{padding:6px 9px}
+}
+@media (prefers-reduced-motion:reduce){
+  .sheet,.sheet-backdrop,.hint{animation:none}
+  .splash,.toast{transition:none}
+}
+</style>
+</head>
+<body>
+<noscript><div style="padding:24px;color:#fff;text-align:center">กรุณาเปิดใช้งาน JavaScript เพื่อใช้แอปนี้</div></noscript>
+
+<div id="shell">
+  <header class="bar">
+    <img class="bar-logo" src="icons/logo-256.png" alt="">
+    <div class="bar-title"><b>ฝึกงาน &amp; สหกิจศึกษา</b><span>BA&amp;IT · มทร.สุวรรณภูมิ</span></div>
+    <button class="bar-chip" id="btnInstall" type="button" data-act="install" aria-label="ติดตั้งแอป" hidden>
+      <svg class="i sm" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M12 7.5v7M9 11.5l3 3 3-3"/></svg><span>ติดตั้งแอป</span>
+    </button>
+    <button class="bar-btn" type="button" data-act="reload" aria-label="โหลดหน้าใหม่" title="โหลดหน้าใหม่">
+      <svg class="i" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+    </button>
+    <button class="bar-btn" type="button" data-act="menu" aria-label="เมนู" title="เมนู" aria-haspopup="dialog">
+      <svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.7" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.7" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.7" fill="currentColor" stroke="none"/></svg>
+    </button>
+    <div class="bar-progress" id="progress"></div>
+  </header>
+  <div class="net-banner" id="netBanner" role="status" hidden>
+    <svg class="i sm" viewBox="0 0 24 24"><path d="M3 3l18 18M8.5 16.1a5 5 0 0 1 7 0M5 12.6a10 10 0 0 1 3.4-2.1M19 12.6a10 10 0 0 0-2.5-1.7M2 8.8a15 15 0 0 1 4.2-2.6M22 8.8A15 15 0 0 0 10.7 5M12 20h.01"/></svg>
+    <span>ขาดการเชื่อมต่ออินเทอร์เน็ต — ข้อมูลที่กรอกจะยังไม่ถูกส่งจนกว่าจะออนไลน์</span>
+  </div>
+  <main class="stage" id="stage" aria-label="ระบบรับสมัครฝึกงานและสหกิจศึกษา"></main>
+</div>
+
+<!-- หน้าจอเปิดแอป -->
+<section class="screen splash" id="splash" aria-live="polite">
+  <img class="splash-logo" src="icons/logo-256.png" alt="">
+  <h1>ระบบรับสมัครฝึกงาน<br>และสหกิจศึกษา</h1>
+  <p class="sub">คณะบริหารธุรกิจและเทคโนโลยีสารสนเทศ<br>มหาวิทยาลัยเทคโนโลยีราชมงคลสุวรรณภูมิ</p>
+  <div class="splash-load" id="splashLoad"></div>
+  <div class="splash-status" id="splashStatus">กำลังเชื่อมต่อระบบ…</div>
+  <div class="splash-actions" id="splashActions" hidden>
+    <button class="btn btn-amber" type="button" data-act="retry">ลองใหม่</button>
+    <button class="btn btn-glass" type="button" data-act="browser">เปิดในเบราว์เซอร์</button>
+  </div>
+  <div class="splash-ver" id="splashVer"></div>
+</section>
+
+<!-- ไม่มีอินเทอร์เน็ต -->
+<section class="screen state" id="offline" hidden>
+  <div class="state-card">
+    <div class="state-ico"><svg class="i" viewBox="0 0 24 24"><path d="M3 3l18 18M8.5 16.1a5 5 0 0 1 7 0M5 12.6a10 10 0 0 1 3.4-2.1M19 12.6a10 10 0 0 0-2.5-1.7M2 8.8a15 15 0 0 1 4.2-2.6M22 8.8A15 15 0 0 0 10.7 5M12 20h.01"/></svg></div>
+    <h2>ไม่มีการเชื่อมต่ออินเทอร์เน็ต</h2>
+    <p>ระบบต้องใช้อินเทอร์เน็ตเพื่อดึงข้อมูลล่าสุด กรุณาเปิด Wi-Fi หรืออินเทอร์เน็ตมือถือ แล้วแอปจะเชื่อมต่อให้อัตโนมัติ</p>
+    <button class="btn btn-navy btn-block" type="button" data-act="retry">ลองเชื่อมต่ออีกครั้ง</button>
+  </div>
+</section>
+
+<!-- ตั้งค่า URL ระบบ (ครั้งแรก) -->
+<section class="screen state" id="setup" hidden>
+  <div class="state-card">
+    <div class="state-ico"><svg class="i" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></div>
+    <h2>เชื่อมแอปกับระบบ</h2>
+    <p>วาง URL ของ Web App จาก Google Apps Script (ลงท้ายด้วย <b>/exec</b>) เพื่อทดลองใช้งานบนเครื่องนี้</p>
+    <form id="setupForm" novalidate>
+      <div class="field">
+        <label for="setupUrl">URL ของ Web App</label>
+        <input id="setupUrl" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false"
+               placeholder="https://script.google.com/macros/s/…/exec">
+        <div class="err" id="setupErr"></div>
+      </div>
+      <button class="btn btn-navy btn-block" type="submit">บันทึกและเปิดระบบ</button>
+    </form>
+    <p class="help">ค่านี้บันทึกไว้เฉพาะเครื่องนี้ ก่อนแจกแอปให้นักศึกษา ให้ใส่ URL ไว้ที่ <b>CONFIG.GAS_URL</b> ในไฟล์ index.html เพื่อให้ทุกเครื่องเปิดได้ทันที</p>
+  </div>
+</section>
+
+<!-- แถบแนะนำการติดตั้ง -->
+<div class="hint" id="hint" role="dialog" aria-label="แนะนำการติดตั้งแอป" hidden>
+  <img src="icons/logo-256.png" alt="">
+  <div class="hint-txt"><b id="hintTitle">ติดตั้งแอปบนหน้าจอโฮม</b><span id="hintSub">เปิดใช้งานได้ทันที เหมือนแอปทั่วไป</span></div>
+  <button class="btn btn-amber" type="button" id="hintBtn" data-act="hint-go">ติดตั้ง</button>
+  <button class="icon-x" type="button" data-act="hint-close" aria-label="ปิด"><svg class="i sm" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+</div>
+
+<!-- Bottom sheet -->
+<div class="sheet-wrap" id="sheetWrap" hidden>
+  <div class="sheet-backdrop" data-act="sheet-close"></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="sheet-grip"></div>
+    <div class="sheet-head">
+      <h2 id="sheetTitle"></h2>
+      <button class="icon-x" id="sheetX" type="button" data-act="sheet-close" aria-label="ปิด"><svg class="i" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="sheet-body" id="sheetBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="vendor/qrcode.min.js" defer></script>
+<script>
+/* =====================================================================
+ *  แอประบบรับสมัครฝึกงานและสหกิจศึกษา (CWIE App Shell) — ใช้ได้ทุกอุปกรณ์
+ *  iOS · Android · แท็บเล็ต · Windows · macOS (ติดตั้งเป็นแอปผ่านเบราว์เซอร์ / PWA)
+ * ===================================================================== */
+(function () {
+  'use strict';
+
+  /* ======================= ตั้งค่า ======================= */
+  var CONFIG = {
+    /* ★ วาง URL ของ Web App ที่นี่ (Apps Script > Deploy > Manage deployments > คัดลอก Web app URL ที่ลงท้ายด้วย /exec)
+       ตัวอย่าง: 'https://script.google.com/macros/s/AKfycbx..................../exec' */
+    GAS_URL: 'https://script.google.com/macros/s/AKfycbyNYLR-3eg42edwrYq6GTKr7MAFiZSebybqAfVlhdT06F1UeMQOwzcjB9j3xh7ihyDd/exec',
+    VERSION: '1.0.0',
+    SLOW_MS: 20000        // รอนานเกินนี้ (มิลลิวินาที) จะแสดงปุ่มลองใหม่ / เปิดในเบราว์เซอร์
+  };
+
+  /* ======================= ตัวช่วยพื้นฐาน ======================= */
+  var $ = function (id) { return document.getElementById(id); };
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { if (v === null || v === undefined) localStorage.removeItem(k); else localStorage.setItem(k, String(v)); } catch (e) { } }
+  function esc(s) { return String(s === null || s === undefined ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+  var DEV = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  var GAS_RE = /^https:\/\/script\.google\.com\/(?:a\/macros\/[^\/\s]+|macros)\/s\/[A-Za-z0-9_-]{20,}\/(?:exec|dev)(?:\?[^\s]*)?$/;
+  function validGasUrl(u) { u = String(u || '').trim(); return GAS_RE.test(u) || (DEV && /^https?:\/\/\S+$/.test(u)); }
+
+  var APP_URL = location.origin + location.pathname.replace(/index\.html$/, '');
+  var params = new URLSearchParams(location.search);
+  var TABS = [
+    { key: '', label: 'หน้าแรก' },
+    { key: 'apply', label: 'ยื่นใบสมัคร' },
+    { key: 'confirm', label: 'ส่งใบตอบรับ' },
+    { key: 'status', label: 'เช็กสถานะ' },
+    { key: 'docs', label: 'ดาวน์โหลดเอกสาร' },
+    { key: 'nitet', label: 'นิเทศสหกิจ' }
+  ];
+  var pendingTab = (function (t) { return TABS.some(function (x) { return x.key && x.key === t; }) ? t : ''; })(params.get('tab'));
+  var wantInstall = params.get('install') === '1';
+
+  /* ล้างพารามิเตอร์ออกจากแถบที่อยู่ (ไม่ให้ติดไปตอนกด “เพิ่มไปยังหน้าจอโฮม”) */
+  if (location.search) { try { history.replaceState(history.state, '', location.pathname); } catch (e) { } }
+
+  /* ======================= ตรวจอุปกรณ์ ======================= */
+  var ua = navigator.userAgent || '';
+  var isIPadOS = /Macintosh/.test(ua) && (navigator.maxTouchPoints || 0) > 1;
+  var isIOS = /iPhone|iPad|iPod/.test(ua) || isIPadOS;
+  var isAndroid = /Android/i.test(ua);
+  var isSamsung = /SamsungBrowser/i.test(ua);
+  var inAppName = /\bLine\//i.test(ua) ? 'LINE'
+    : /FBAN|FBAV|FB_IAB|FBIOS|Messenger/i.test(ua) ? 'Facebook'
+    : /Instagram/i.test(ua) ? 'Instagram'
+    : /musical_ly|BytedanceWebview|TikTok/i.test(ua) ? 'TikTok'
+    : (isAndroid && /; wv\)/.test(ua)) ? 'แอปอื่น' : '';
+  var isIOSSafari = isIOS && /Safari/i.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|GSA\/|YaBrowser|DuckDuckGo/i.test(ua) && !inAppName;
+  var OS = isIOS ? 'ios' : (isAndroid ? 'android' : 'desktop');
+  function isStandalone() {
+    try {
+      if (navigator.standalone === true) return true;
+      return ['standalone', 'fullscreen', 'minimal-ui', 'window-controls-overlay'].some(function (m) {
+        return window.matchMedia('(display-mode: ' + m + ')').matches;
+      });
+    } catch (e) { return false; }
+  }
+  function deviceLabel() {
+    var dev = isIPadOS || /iPad/.test(ua) ? 'iPad' : isIOS ? 'iPhone' : isAndroid ? 'Android' : (/Windows/.test(ua) ? 'Windows' : /Mac/.test(ua) ? 'Mac' : 'คอมพิวเตอร์');
+    var br = inAppName ? ('แอป ' + inAppName) : /EdgA?|Edg\//.test(ua) ? 'Edge' : isSamsung ? 'Samsung Internet' : /CriOS|Chrome/.test(ua) ? 'Chrome' : /FxiOS|Firefox/.test(ua) ? 'Firefox' : /Safari/.test(ua) ? 'Safari' : 'เบราว์เซอร์';
+    return dev + ' · ' + br + (isStandalone() ? ' · โหมดแอป' : '');
+  }
+
+  /* ======================= ไอคอน ======================= */
+  function ic(paths, cls) { return '<svg class="i ' + (cls || '') + '" viewBox="0 0 24 24">' + paths + '</svg>'; }
+  var I = {
+    install: '<rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M12 7.5v7M9 11.5l3 3 3-3"/>',
+    qr: '<rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><path d="M14 14h3v3h-3zM20.5 14v.01M14 20.5h.01M17.5 20.5h3v-3"/>',
+    reload: '<path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>',
+    external: '<path d="M14 3h7v7"/><path d="M10 14 21 3"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/>',
+    info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.6h.01"/>',
+    text: '<path d="M3.5 18 8.5 6l5 12M5.3 14h6.4"/><path d="M15 18l3-7 3 7M15.9 16h4.2"/>',
+    share: '<path d="M8 10H6.5A2.5 2.5 0 0 0 4 12.5v6A2.5 2.5 0 0 0 6.5 21h11a2.5 2.5 0 0 0 2.5-2.5v-6a2.5 2.5 0 0 0-2.5-2.5H16"/><path d="M12 15V3M8 7l4-4 4 4"/>',
+    plusSq: '<rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M12 8.5v7M8.5 12h7"/>',
+    copy: '<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+    check: '<path d="M20 6 9 17l-5-5"/>',
+    download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
+    send: '<path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/>',
+    link: '<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>',
+    trash: '<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>',
+    dots: '<circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
+    kebab: '<circle cx="12" cy="5" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.6" fill="currentColor" stroke="none"/>'
+  };
+  function kbd(icon, text) { return '<span class="kbd">' + (icon ? ic(I[icon]) : '') + esc(text) + '</span>'; }
+
+  /* ======================= Toast ======================= */
+  var toastTimer = null;
+  function toast(msg, ms) {
+    var t = $('toast');
+    t.textContent = msg;
+    t.classList.add('on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove('on'); }, ms || 2600);
+  }
+
+  /* ======================= URL ระบบ ======================= */
+  var gasSource = 'config';
+  function resolveGasUrl() {
+    if (validGasUrl(CONFIG.GAS_URL)) { gasSource = 'config'; return CONFIG.GAS_URL.trim(); }
+    var saved = lsGet('cwie_gas_url');
+    if (validGasUrl(saved)) { gasSource = 'local'; return saved.trim(); }
+    return '';
+  }
+  var GAS_URL = resolveGasUrl();
+
+  /* ======================= โหลดระบบในแอป ======================= */
+  var frame = null, appWin = null, appOrigin = '*', ready = false, firstLoad = true;
+  var timers = {};
+  function clearTimers() { Object.keys(timers).forEach(function (k) { clearTimeout(timers[k]); }); timers = {}; }
+  function setProgress(on) { $('progress').classList.toggle('on', !!on); }
+  function splashStatus(text) { $('splashStatus').textContent = text; }
+
+  function mountFrame() {
+    if (!GAS_URL) { showSetup(); return; }
+    if (navigator.onLine === false) { showOffline(); return; }
+    $('offline').hidden = true;
+    $('setup').hidden = true;
+    clearTimers();
+    ready = false;
+    appWin = null;
+    $('splashActions').hidden = true;
+    $('splashLoad').hidden = false;
+    if (firstLoad) splashStatus('กำลังเชื่อมต่อระบบ…');
+    setProgress(true);
+
+    var f = document.createElement('iframe');
+    f.id = 'appFrame';
+    f.title = 'ระบบรับสมัครฝึกงานและสหกิจศึกษา';
+    f.setAttribute('allow', 'camera; microphone; geolocation; clipboard-write; fullscreen; web-share');
+    f.setAttribute('allowfullscreen', '');
+    f.addEventListener('load', onFrameLoad);
+    f.src = GAS_URL;
+    var stage = $('stage');
+    while (stage.firstChild) stage.removeChild(stage.firstChild);
+    stage.appendChild(f);
+    frame = f;
+
+    timers.status = setTimeout(function () {
+      if (!ready) splashStatus('เซิร์ฟเวอร์กำลังเตรียมระบบ อาจใช้เวลาสักครู่…');
+    }, 6000);
+    timers.slow = setTimeout(onSlow, CONFIG.SLOW_MS);
+  }
+
+  function onFrameLoad() {
+    /* ถ้า Index.html ยังไม่ได้อัปเดตให้ส่งสัญญาณกลับมา ก็ยังเปิดหน้าจอให้ใช้งานได้ */
+    clearTimeout(timers.fallback);
+    timers.fallback = setTimeout(function () { if (!ready) markReady(); }, 3500);
+  }
+
+  function markReady() {
+    if (ready) return;
+    ready = true;
+    clearTimers();
+    setProgress(false);
+    $('splash').classList.add('out');
+    $('splashActions').hidden = true;
+    if (firstLoad) { firstLoad = false; setTimeout(afterFirstReady, 900); }
+  }
+
+  function onSlow() {
+    if (ready) return;
+    if (!$('splash').classList.contains('out')) {
+      splashStatus('ระบบใช้เวลาตอบกลับนานกว่าปกติ ตรวจสอบอินเทอร์เน็ต แล้วลองใหม่อีกครั้ง');
+      $('splashLoad').hidden = true;
+      $('splashActions').hidden = false;
+    } else {
+      toast('การเชื่อมต่อช้า กำลังรอระบบตอบกลับ…', 4000);
+    }
+  }
+
+  function reloadApp() {
+    if (!GAS_URL) { showSetup(); return; }
+    mountFrame();
+  }
+
+  function openInBrowser() {
+    if (!GAS_URL) { showSetup(); return; }
+    var w = window.open(GAS_URL, '_blank', 'noopener');
+    if (!w) location.href = GAS_URL;
+  }
+
+  function showOffline() {
+    $('offline').hidden = false;
+    $('splash').classList.add('out');
+    setProgress(false);
+  }
+
+  function showSetup() {
+    $('splash').classList.add('out');
+    $('setup').hidden = false;
+    setProgress(false);
+    var inp = $('setupUrl');
+    inp.value = lsGet('cwie_gas_url') || '';
+    setTimeout(function () { try { inp.focus(); } catch (e) { } }, 300);
+  }
+
+  $('setupForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var v = $('setupUrl').value.trim();
+    if (!validGasUrl(v)) {
+      $('setupErr').textContent = 'รูปแบบ URL ไม่ถูกต้อง ต้องขึ้นต้นด้วย https://script.google.com/ และลงท้ายด้วย /exec';
+      return;
+    }
+    $('setupErr').textContent = '';
+    lsSet('cwie_gas_url', v);
+    GAS_URL = v;
+    gasSource = 'local';
+    $('setup').hidden = true;
+    $('splash').classList.remove('out');
+    firstLoad = true;
+    mountFrame();
+  });
+
+  /* ======================= สื่อสารกับระบบ (postMessage) ======================= */
+  function trustedOrigin(origin) {
+    if (DEV) return true;
+    try {
+      var h = new URL(origin).hostname;
+      return /(^|\.)googleusercontent\.com$/.test(h) || h === 'script.google.com';
+    } catch (e) { return false; }
+  }
+  function sendToApp(msg) {
+    if (!appWin) return false;
+    msg.cwieShell = 1;
+    try { appWin.postMessage(msg, appOrigin || '*'); return true; } catch (e) { return false; }
+  }
+  var backWaiters = {};
+  var fontScale = parseFloat(lsGet('cwie_font')) || 1;
+
+  window.addEventListener('message', function (ev) {
+    var d = ev.data;
+    if (!d || typeof d !== 'object' || d.cwieApp !== 1) return;
+    if (!trustedOrigin(ev.origin)) return;
+    if (ev.source) appWin = ev.source;
+    appOrigin = (ev.origin && ev.origin !== 'null') ? ev.origin : '*';
+
+    if (d.type === 'hello') {
+      markReady();
+      sendToApp({ type: 'init', standalone: isStandalone(), os: OS, tab: pendingTab, fontScale: fontScale, shellVersion: CONFIG.VERSION });
+      pendingTab = '';
+    } else if (d.type === 'back-result') {
+      var fn = backWaiters[d.id];
+      if (fn) { delete backWaiters[d.id]; fn(!!d.handled); }
+    }
+  });
+
+  function askAppBack() {
+    return new Promise(function (resolve) {
+      if (!ready || !appWin) { resolve(false); return; }
+      var id = 'b' + Date.now() + Math.random().toString(36).slice(2, 6);
+      var t = setTimeout(function () { delete backWaiters[id]; resolve(false); }, 400);
+      backWaiters[id] = function (h) { clearTimeout(t); resolve(h); };
+      if (!sendToApp({ type: 'back', id: id })) { clearTimeout(t); delete backWaiters[id]; resolve(false); }
+    });
+  }
+
+  /* ======================= ปุ่มย้อนกลับของ Android (โหมดแอป) ======================= */
+  function setupBackGuard() {
+    if (!(isAndroid && isStandalone())) return;
+    try {
+      history.replaceState({ cwie: 'root' }, '');
+      history.pushState({ cwie: 'guard' }, '');
+    } catch (e) { return; }
+    window.addEventListener('popstate', function () {
+      var rearm = function () { try { history.pushState({ cwie: 'guard' }, ''); } catch (e) { } };
+      if (sheetIsOpen()) { closeSheet(); rearm(); return; }
+      if (!$('hint').hidden) { hideHint(true); rearm(); return; }
+      askAppBack().then(function (handled) {
+        if (handled) { rearm(); return; }
+        toast('กดย้อนกลับอีกครั้งเพื่อออกจากแอป', 2000);
+        setTimeout(function () {
+          if (history.state && history.state.cwie === 'root') rearm();
+        }, 2100);
+      });
+    });
+  }
+
+  /* ======================= ติดตั้งแอป ======================= */
+  var deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    updateInstallUI();
+  });
+  window.addEventListener('appinstalled', function () {
+    deferredPrompt = null;
+    updateInstallUI();
+    hideHint(false);
+    toast('ติดตั้งแอปเรียบร้อย เปิดได้จากหน้าจอหลักหรือเมนูแอป', 3500);
+  });
+
+  function installAvailable() {
+    if (isStandalone()) return false;
+    return !!deferredPrompt || isIOS || isAndroid || !!inAppName;
+  }
+  function updateInstallUI() { $('btnInstall').hidden = !installAvailable(); }
+
+  function promptInstall() {
+    if (!deferredPrompt) { openInstallGuide(); return; }
+    var p = deferredPrompt;
+    deferredPrompt = null;
+    try {
+      p.prompt();
+      p.userChoice.then(function (r) {
+        if (r && r.outcome === 'accepted') { hideHint(false); }
+        updateInstallUI();
+      }).catch(function () { updateInstallUI(); });
+    } catch (e) { openInstallGuide(); }
+  }
+
+  function startInstall() {
+    if (inAppName === 'LINE') { openExternal(); return; }
+    if (deferredPrompt) { promptInstall(); return; }
+    openInstallGuide();
+  }
+
+  function openExternal() {
+    /* LINE รองรับพารามิเตอร์ openExternalBrowser=1 เพื่อเปิดลิงก์ในเบราว์เซอร์ของเครื่อง
+       install=1 = เมื่อเปิดในเบราว์เซอร์แล้ว ให้แสดงวิธีติดตั้งทันที */
+    location.href = APP_URL + '?openExternalBrowser=1&install=1';
+  }
+
+  function installGuideHtml() {
+    var h = '';
+    if (isStandalone()) {
+      return '<div class="note ok">✓ แอปติดตั้งอยู่บนเครื่องนี้แล้ว — เปิดได้จากไอคอน <b>ฝึกงาน-สหกิจ</b> บนหน้าจอโฮม / เมนูแอป</div>' +
+        '<p class="help">ต้องการให้เพื่อนติดตั้งด้วย? ใช้เมนู “แชร์แอป / QR Code”</p>';
+    }
+    if (inAppName) {
+      h += '<div class="note warn">ตอนนี้เปิดผ่าน <b>' + esc(inAppName) + '</b> ซึ่งติดตั้งแอปไม่ได้ และอาจแนบไฟล์ไม่สำเร็จ ' +
+        'กรุณาเปิดในเบราว์เซอร์ของเครื่อง (' + (isIOS ? 'Safari' : 'Chrome') + ') ก่อน</div>';
+      if (inAppName === 'LINE') {
+        h += '<div class="row"><button class="btn btn-amber btn-block" type="button" data-act="external">' + ic(I.external, 'sm') + 'เปิดใน ' + (isIOS ? 'Safari' : 'Chrome') + '</button></div>';
+      }
+      h += '<ol class="steps"><li>แตะ ' + kbd(isIOS ? 'dots' : 'kebab', '') + ' มุมขวาบน (หรือขวาล่าง)</li>' +
+        '<li>เลือก <b>“เปิดในเบราว์เซอร์”</b> / <b>Open in browser</b></li>' +
+        '<li>เมื่อเปิดในเบราว์เซอร์แล้ว แตะปุ่ม <b>ติดตั้งแอป</b> ที่แถบด้านบน</li></ol>' + copyLinkHtml();
+      return h;
+    }
+    if (isIOS) {
+      if (isIOSSafari) {
+        h += '<p class="lead">เพิ่มแอปไว้บนหน้าจอโฮมของ iPhone / iPad ใช้เวลาไม่ถึง 10 วินาที</p>' +
+          '<ol class="steps">' +
+          '<li>แตะปุ่ม ' + kbd('share', 'แชร์') + ' ของ Safari<small>iPhone: แถบด้านล่าง · iPad: มุมขวาบน · ถ้าไม่เห็นปุ่มนี้ ให้แตะ ' + kbd('dots', '') + ' ก่อน</small></li>' +
+          '<li>เลื่อนลงแล้วแตะ ' + kbd('plusSq', 'เพิ่มไปยังหน้าจอโฮม') + '</li>' +
+          '<li>เปิด <b>“เปิดเป็นเว็บแอป”</b> ไว้ (ถ้ามีตัวเลือกนี้) แล้วแตะ <b>เพิ่ม</b> มุมขวาบน</li>' +
+          '</ol>';
+      } else {
+        h += '<p class="lead">บน iPhone / iPad ติดตั้งผ่านเมนูแชร์ของเบราว์เซอร์</p>' +
+          '<ol class="steps">' +
+          '<li>แตะปุ่ม ' + kbd('share', 'แชร์') + '<small>Chrome: อยู่ที่แถบที่อยู่เว็บด้านบน · Edge/Firefox: ในเมนู ' + kbd('dots', '') + '</small></li>' +
+          '<li>เลือก ' + kbd('plusSq', 'เพิ่มไปยังหน้าจอโฮม') + ' แล้วแตะ <b>เพิ่ม</b></li>' +
+          '</ol><div class="note">ถ้าไม่พบเมนูนี้ ให้คัดลอกลิงก์ด้านล่างไปเปิดใน <b>Safari</b> แล้วทำตามขั้นตอนเดิม</div>' + copyLinkHtml();
+      }
+      h += '<div class="note">ไอคอน <b>ฝึกงาน-สหกิจ</b> จะอยู่บนหน้าจอโฮม แตะเปิดได้แบบเต็มจอเหมือนแอปทั่วไป</div>';
+      return h;
+    }
+    if (deferredPrompt) {
+      h += '<p class="lead">ติดตั้งแอปลงเครื่องนี้ได้ทันที ไม่ต้องผ่าน Play Store ไม่กินพื้นที่ และอัปเดตอัตโนมัติ</p>' +
+        '<div class="row"><button class="btn btn-amber btn-block" type="button" data-act="prompt">' + ic(I.install, 'sm') + 'ติดตั้งเลย</button></div>';
+      return h;
+    }
+    if (isAndroid) {
+      if (isSamsung) {
+        h += '<ol class="steps"><li>แตะ <span class="kbd">≡</span> ที่แถบด้านล่าง</li>' +
+          '<li>เลือก <b>“เพิ่มหน้าลงใน”</b> → <b>“หน้าจอหลัก”</b></li><li>แตะ <b>เพิ่ม</b></li></ol>';
+      } else {
+        h += '<ol class="steps"><li>แตะ ' + kbd('kebab', '') + ' มุมขวาบนของ Chrome</li>' +
+          '<li>เลือก <b>“ติดตั้งแอป”</b> หรือ <b>“เพิ่มลงในหน้าจอหลัก”</b></li><li>แตะ <b>ติดตั้ง</b></li></ol>' +
+          '<div class="note"><b>Samsung Internet:</b> แตะ ≡ → “เพิ่มหน้าลงใน” → “หน้าจอหลัก”</div>';
+      }
+      h += '<div class="note">ไอคอน <b>ฝึกงาน-สหกิจ</b> จะอยู่ในหน้าจอหลักและลิ้นชักแอป</div>';
+      return h;
+    }
+    h += '<p class="lead">ติดตั้งเป็นแอปบนคอมพิวเตอร์ เปิดเป็นหน้าต่างแยก ปักหมุดไว้ที่ Taskbar / Dock ได้</p>' +
+      '<ol class="steps">' +
+      '<li><b>Chrome / Edge:</b> คลิกไอคอนติดตั้งที่ท้ายช่องที่อยู่เว็บ หรือเมนู ' + kbd('kebab', '') + ' → <b>ติดตั้ง…</b> / <b>แอป → ติดตั้งไซต์นี้เป็นแอป</b></li>' +
+      '<li><b>Safari บน Mac:</b> เมนู <b>ไฟล์</b> → <b>เพิ่มไปยัง Dock</b></li>' +
+      '</ol><div class="note">Firefox ยังไม่รองรับการติดตั้ง แนะนำใช้ Chrome หรือ Edge</div>';
+    return h;
+  }
+
+  function copyLinkHtml() {
+    return '<div class="linkbox"><code>' + esc(APP_URL) + '</code><button type="button" data-act="copy" data-text="' + esc(APP_URL) + '" aria-label="คัดลอกลิงก์">' + ic(I.copy, 'sm') + '</button></div>';
+  }
+
+  function openInstallGuide() {
+    openSheet(isStandalone() ? 'ติดตั้งแล้ว' : 'ติดตั้งแอปบนเครื่องนี้', installGuideHtml());
+  }
+
+  /* ======================= แถบแนะนำการติดตั้ง ======================= */
+  function recentlyDismissed(key, days) {
+    var t = parseInt(lsGet(key), 10) || 0;
+    return Date.now() - t < days * 864e5;
+  }
+  function showHint() {
+    if (isStandalone() || sheetIsOpen()) return;
+    if (inAppName) {
+      $('hintTitle').textContent = 'เปิดในเบราว์เซอร์เพื่อใช้งานเต็มรูปแบบ';
+      $('hintSub').textContent = 'ใน ' + inAppName + ' แนบไฟล์และติดตั้งแอปไม่ได้';
+      $('hintBtn').textContent = 'เปิด';
+    } else {
+      $('hintTitle').textContent = 'ติดตั้งแอปบนหน้าจอโฮม';
+      $('hintSub').textContent = 'เปิดใช้งานได้ทันที เต็มจอ เหมือนแอปทั่วไป';
+      $('hintBtn').textContent = 'ติดตั้ง';
+    }
+    $('hint').hidden = false;
+  }
+  function hideHint(remember) {
+    $('hint').hidden = true;
+    if (remember) lsSet('cwie_hint_hide', Date.now());
+  }
+
+  function afterFirstReady() {
+    updateInstallUI();
+    if (isStandalone()) return;
+    if (wantInstall) { wantInstall = false; openInstallGuide(); return; }
+    if (!(isIOS || isAndroid || inAppName)) return;
+    if (!inAppName && recentlyDismissed('cwie_hint_hide', 3)) return;
+    setTimeout(showHint, 1800);
+  }
+
+  /* ======================= Bottom sheet ======================= */
+  var sheetOpener = null;
+  function sheetIsOpen() { return !$('sheetWrap').hidden; }
+  function openSheet(title, html, onMount) {
+    sheetOpener = document.activeElement;
+    $('sheetTitle').textContent = title;
+    $('sheetBody').innerHTML = html;
+    $('sheetWrap').hidden = false;
+    $('sheetBody').scrollTop = 0;
+    if (onMount) onMount($('sheetBody'));
+    setTimeout(function () { try { $('sheetX').focus({ preventScroll: true }); } catch (e) { } }, 40);
+  }
+  function closeSheet() {
+    if (!sheetIsOpen()) return;
+    $('sheetWrap').hidden = true;
+    $('sheetBody').innerHTML = '';
+    if (sheetOpener && sheetOpener.focus) { try { sheetOpener.focus({ preventScroll: true }); } catch (e) { } }
+  }
+
+  /* ---------- เมนู ---------- */
+  function mi(act, icon, title, sub) {
+    return '<button class="mi" type="button" data-act="' + act + '"><span class="mi-ico">' + ic(I[icon]) + '</span>' +
+      '<span>' + esc(title) + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</span></button>';
+  }
+  function fontRowHtml() {
+    var opts = [[1, 'ปกติ'], [1.12, 'ใหญ่'], [1.25, 'ใหญ่มาก']];
+    return '<div class="mi-row"><span class="mi-ico">' + ic(I.text) + '</span><div>ขนาดตัวอักษร</div>' +
+      '<div class="seg" role="group" aria-label="ขนาดตัวอักษร">' + opts.map(function (o) {
+        return '<button type="button" data-act="font" data-v="' + o[0] + '" class="' + (Math.abs(fontScale - o[0]) < .01 ? 'on' : '') + '">' + o[1] + '</button>';
+      }).join('') + '</div></div>';
+  }
+  function openMenu() {
+    var h = '';
+    if (!isStandalone()) h += mi('install', 'install', 'ติดตั้งแอปบนเครื่องนี้', inAppName ? 'เปิดในเบราว์เซอร์ก่อนติดตั้ง' : 'เปิดได้จากหน้าจอโฮม ไม่ต้องพิมพ์ลิงก์');
+    h += mi('share', 'qr', 'แชร์แอป / QR Code', 'ให้นักศึกษาสแกนเพื่อเปิดและติดตั้งแอป');
+    h += fontRowHtml();
+    h += mi('reload', 'reload', 'โหลดหน้าใหม่', 'ดึงข้อมูลล่าสุดจากระบบ');
+    h += mi('browser', 'external', 'เปิดในเบราว์เซอร์', 'ใช้เมื่อดาวน์โหลดไฟล์หรือแสดงผลในแอปไม่ได้');
+    h += mi('about', 'info', 'เกี่ยวกับแอป', 'เวอร์ชัน ' + CONFIG.VERSION);
+    openSheet('เมนู', h);
+  }
+
+  function setFont(v) {
+    fontScale = v;
+    lsSet('cwie_font', v);
+    sendToApp({ type: 'font', scale: v });
+    var seg = document.querySelectorAll('[data-act="font"]');
+    for (var i = 0; i < seg.length; i++) seg[i].classList.toggle('on', Math.abs(parseFloat(seg[i].getAttribute('data-v')) - v) < .01);
+  }
+
+  /* ---------- แชร์ / QR ---------- */
+  var shareTab = '';
+  function shareUrl() {
+    return APP_URL + '?openExternalBrowser=1' + (shareTab ? '&tab=' + shareTab : '');
+  }
+  function openShare() {
+    var h = '<p class="help center" style="text-align:center;margin:0 0 4px">ให้นักศึกษาสแกนด้วยกล้องมือถือ หรือแชร์ลิงก์ทาง LINE<br>เพื่อเปิดระบบและติดตั้งแอปบนเครื่อง</p>' +
+      '<div class="chips" role="group" aria-label="หน้าที่จะเปิด">' + TABS.map(function (t) {
+        return '<button type="button" data-act="share-tab" data-v="' + t.key + '" class="' + (t.key === shareTab ? 'on' : '') + '">' + esc(t.label) + '</button>';
+      }).join('') + '</div>' +
+      '<div class="qr-box"><img id="qrImg" alt="QR Code สำหรับเปิดแอป"><small>กดค้างที่รูปเพื่อบันทึก หรือพิมพ์ติดบอร์ดประชาสัมพันธ์</small></div>' +
+      '<div class="linkbox"><code id="shareLink"></code><button type="button" data-act="copy-share" aria-label="คัดลอกลิงก์">' + ic(I.copy, 'sm') + '</button></div>' +
+      '<div class="row">' +
+      (navigator.share ? '<button class="btn btn-navy" type="button" data-act="native-share">' + ic(I.send, 'sm') + 'แชร์</button>' : '') +
+      '<button class="btn btn-outline" type="button" data-act="save-qr">' + ic(I.download, 'sm') + 'บันทึกรูป QR</button></div>';
+    openSheet('แชร์แอป / QR Code', h, renderShare);
+  }
+
+  var qrDataUrl = '';
+  function renderShare() {
+    var url = shareUrl();
+    var link = $('shareLink');
+    if (link) link.textContent = url;
+    var img = $('qrImg');
+    if (!img) return;
+    if (typeof window.qrcode !== 'function') {
+      img.alt = 'กำลังโหลดตัวสร้าง QR…';
+      setTimeout(renderShare, 400);
+      return;
+    }
+    drawQr(url, function (dataUrl) {
+      qrDataUrl = dataUrl;
+      var im = $('qrImg');
+      if (im) im.src = dataUrl;
+    });
+  }
+
+  function drawQr(text, done) {
+    var qr = window.qrcode(0, 'H');
+    qr.addData(text);
+    qr.make();
+    var n = qr.getModuleCount();
+    var W = 720, pad = 56, qrSize = W - pad * 2, cell = qrSize / n, H = W + 120;
+    var cv = document.createElement('canvas');
+    cv.width = W; cv.height = H;
+    var g = cv.getContext('2d');
+    g.fillStyle = '#ffffff';
+    g.fillRect(0, 0, W, H);
+    g.fillStyle = '#16213a';
+    for (var r = 0; r < n; r++) {
+      for (var c = 0; c < n; c++) {
+        if (qr.isDark(r, c)) g.fillRect(Math.floor(pad + c * cell), Math.floor(pad + r * cell), Math.ceil(cell), Math.ceil(cell));
+      }
+    }
+    var font = getComputedStyle(document.body).fontFamily;
+    g.textAlign = 'center';
+    g.fillStyle = '#1f3a5f';
+    g.font = '700 34px ' + font;
+    var label = 'สแกนเพื่อเปิดแอป ฝึกงาน-สหกิจ';
+    var tab = TABS.filter(function (t) { return t.key === shareTab; })[0];
+    if (shareTab && tab) label = 'สแกนเพื่อ' + tab.label;
+    g.fillText(label, W / 2, W + 34);
+    g.fillStyle = '#5b6170';
+    g.font = '400 23px ' + font;
+    g.fillText('คณะบริหารธุรกิจและเทคโนโลยีสารสนเทศ มทร.สุวรรณภูมิ', W / 2, W + 76);
+
+    var logo = new Image();
+    logo.onload = function () {
+      var ls = Math.round(qrSize * 0.2), lx = (W - ls) / 2, ly = pad + (qrSize - ls) / 2;
+      g.fillStyle = '#ffffff';
+      roundRect(g, lx - 10, ly - 10, ls + 20, ls + 20, 22);
+      g.fill();
+      g.drawImage(logo, lx, ly, ls, ls);
+      done(cv.toDataURL('image/png'));
+    };
+    logo.onerror = function () { done(cv.toDataURL('image/png')); };
+    logo.src = 'icons/logo-256.png';
+  }
+  function roundRect(g, x, y, w, h, r) {
+    g.beginPath();
+    g.moveTo(x + r, y);
+    g.arcTo(x + w, y, x + w, y + h, r);
+    g.arcTo(x + w, y + h, x, y + h, r);
+    g.arcTo(x, y + h, x, y, r);
+    g.arcTo(x, y, x + w, y, r);
+    g.closePath();
+  }
+
+  function copyText(text) {
+    var ok = function () { toast('คัดลอกลิงก์แล้ว'); };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(ok, function () { legacyCopy(text); ok(); });
+    } else { legacyCopy(text); ok(); }
+  }
+  function legacyCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) { }
+    document.body.removeChild(ta);
+  }
+  function saveQr() {
+    if (!qrDataUrl) return;
+    if (isIOS && isStandalone()) { toast('กดค้างที่รูป QR แล้วเลือก “บันทึกไปยังรูปภาพ”', 3500); return; }
+    var a = document.createElement('a');
+    a.href = qrDataUrl;
+    a.download = 'QR-ฝึกงาน-สหกิจ' + (shareTab ? '-' + shareTab : '') + '.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+  function nativeShare() {
+    var data = { title: 'ระบบรับสมัครฝึกงานและสหกิจศึกษา BA&IT', text: 'เปิดระบบรับสมัครฝึกงาน/สหกิจศึกษา และติดตั้งแอปบนมือถือ', url: shareUrl() };
+    navigator.share(data).catch(function () { });
+  }
+
+  /* ---------- เกี่ยวกับแอป ---------- */
+  function openAbout() {
+    var swState = ('serviceWorker' in navigator && navigator.serviceWorker.controller) ? 'พร้อมใช้งาน' : 'ยังไม่เปิดใช้';
+    var h = '<dl class="kv">' +
+      '<dt>แอป</dt><dd>ระบบรับสมัครฝึกงานและสหกิจศึกษา</dd>' +
+      '<dt>เวอร์ชัน</dt><dd>' + esc(CONFIG.VERSION) + '</dd>' +
+      '<dt>อุปกรณ์</dt><dd>' + esc(deviceLabel()) + '</dd>' +
+      '<dt>แคชออฟไลน์</dt><dd>' + swState + '</dd>' +
+      '<dt>ระบบหลัก</dt><dd>' + (GAS_URL ? esc(GAS_URL.replace(/^https:\/\//, '').slice(0, 64)) + (GAS_URL.length > 72 ? '…' : '') : '-') +
+      (gasSource === 'local' ? ' <small style="color:var(--muted)">(ตั้งค่าในเครื่องนี้)</small>' : '') + '</dd>' +
+      '</dl>' +
+      '<div class="note">คณะบริหารธุรกิจและเทคโนโลยีสารสนเทศ มหาวิทยาลัยเทคโนโลยีราชมงคลสุวรรณภูมิ — งานฝึกงานและสหกิจศึกษา</div>' +
+      '<div class="row">' +
+      (gasSource === 'local' ? '<button class="btn btn-outline" type="button" data-act="reset-url">' + ic(I.link, 'sm') + 'เปลี่ยน URL ระบบ</button>' : '') +
+      '<button class="btn btn-outline" type="button" data-act="clear-cache">' + ic(I.trash, 'sm') + 'ล้างแคชแอป</button></div>';
+    openSheet('เกี่ยวกับแอป', h);
+  }
+
+  function clearCache() {
+    var jobs = [];
+    if (window.caches && caches.keys) jobs.push(caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); }));
+    if ('serviceWorker' in navigator && navigator.serviceWorker.getRegistrations) {
+      jobs.push(navigator.serviceWorker.getRegistrations().then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); }));
+    }
+    Promise.all(jobs).then(function () {
+      toast('ล้างแคชแล้ว กำลังเปิดแอปใหม่…');
+      setTimeout(function () { location.reload(); }, 800);
+    });
+  }
+
+  /* ======================= ตัวจัดการปุ่มทั้งหมด ======================= */
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest ? e.target.closest('[data-act]') : null;
+    if (!el) return;
+    var act = el.getAttribute('data-act');
+    switch (act) {
+      case 'menu': openMenu(); break;
+      case 'reload': closeSheet(); reloadApp(); break;
+      case 'retry': firstLoad = true; $('splash').classList.remove('out'); mountFrame(); break;
+      case 'browser': closeSheet(); openInBrowser(); break;
+      case 'install': closeSheet(); hideHint(false); startInstall(); break;
+      case 'prompt': closeSheet(); promptInstall(); break;
+      case 'external': openExternal(); break;
+      case 'share': openShare(); break;
+      case 'share-tab':
+        shareTab = el.getAttribute('data-v') || '';
+        var chips = document.querySelectorAll('[data-act="share-tab"]');
+        for (var i = 0; i < chips.length; i++) chips[i].classList.toggle('on', chips[i] === el);
+        renderShare();
+        break;
+      case 'copy-share': copyText(shareUrl()); break;
+      case 'copy': copyText(el.getAttribute('data-text') || APP_URL); break;
+      case 'native-share': nativeShare(); break;
+      case 'save-qr': saveQr(); break;
+      case 'font': setFont(parseFloat(el.getAttribute('data-v')) || 1); break;
+      case 'about': openAbout(); break;
+      case 'clear-cache': clearCache(); break;
+      case 'reset-url': closeSheet(); lsSet('cwie_gas_url', null); GAS_URL = resolveGasUrl(); showSetup(); break;
+      case 'sheet-close': closeSheet(); break;
+      case 'hint-go': hideHint(false); startInstall(); break;
+      case 'hint-close': hideHint(true); break;
+    }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && sheetIsOpen()) closeSheet();
+  });
+
+  /* ======================= สถานะอินเทอร์เน็ต ======================= */
+  window.addEventListener('offline', function () { $('netBanner').hidden = false; });
+  window.addEventListener('online', function () {
+    $('netBanner').hidden = true;
+    if (!$('offline').hidden || !frame) { firstLoad = true; $('splash').classList.remove('out'); mountFrame(); }
+    else toast('เชื่อมต่ออินเทอร์เน็ตแล้ว');
+  });
+
+  /* ======================= Service Worker (เปิดแอปเร็ว + ใช้ออฟไลน์ได้) ======================= */
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || DEV)) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function () { });
+    });
+  }
+
+  /* ======================= เริ่มทำงาน ======================= */
+  $('splashVer').textContent = 'เวอร์ชัน ' + CONFIG.VERSION;
+  document.documentElement.classList.add('os-' + OS);
+  updateInstallUI();
+  setupBackGuard();
+  mountFrame();
+})();
+</script>
+</body>
+</html>
